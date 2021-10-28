@@ -1,0 +1,25 @@
+Major Technologies Used:
+MERN 
+GraphQL
+@apollo/client
+Material UI
+
+Points to Self:-
+# Project divided into two client (FE) and server (BE)
+
+SERVER:-
+# run 'npm init -y' to create a package.json with the required fields
+# 'GraphQLServer' requires two things -- 'typeDefs' to declare Query and Mutations or Data Types(like struct)
+# -- 'Resolvers' to give definition to Q & M. 
+# 'mongoose' requires setting up a connection with address and an object of flags as params
+# 'mongoose' requires declaring a model (object's structure data will look like)
+# graphql runs at 'localhost:4000'
+# To run the server -- 'node index.js'
+
+CLIENT:-
+# Use npm package 'create-react-app client' to create a boilerplate folder 'client' with everything in it
+# Edit or delete files as per need
+# 'index.js' is the first file that is run while executing a FE project after 'index.html' in public dir 
+# 'index.js' is where we setup connection with BE using 'ApolloClient'
+# Put the whole Data in ReactDOM.render in <ApolloProvider> wrapper and pass ApolloClient object to the AP client param
+# '@apollo/client' keeps on changing. I'm using v3 so need some editing according to the ver since functions get depricated
