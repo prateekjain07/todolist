@@ -47,8 +47,8 @@ const RemoveMutation = gql`
   }
 `;
 const CreateMutation = gql`
-  mutation($id: ID!){
-    createTodo(id: $id){
+  mutation($text : String!){
+    createTodo(text: $text){
       id
       text
       complete
@@ -64,36 +64,44 @@ function App() {
   const [updateTodo, { dataUpdate }] = useMutation(UpdateMutation);
   const [removeTodo, {dataRemove}] = useMutation(RemoveMutation);
   const [createTodo, {dataCreate}] = useMutation(CreateMutation);
-  // useEffect(){
-
-  // },[];
+  const [textStr, setTextStr] = useState("");
   const updateTodoFn = async todo => {
     await updateTodo({ variables: { id: todo.id, complete: !todo.complete } })
       .then(result => console.log(result));
   }
-  const removeTodoFn = async todo => {
-    await removeTodo({variables: {id: todo.id}})
-
-    // await removeTodo({variables: {id: todo.id},
-      
-    //   update: cache => {
-    //     console.log('Updating data');
-    //     let data = cache.readQuery({ query: TodosQuery });
-    //     console.log(data);
-    //     let abc = {todos: ""};
-    //     abc.todos = data.todos.filter(({id: itemId}) => itemId !== todo.id);
-    //     console.log('Intermediate data');
-    //     console.log(abc);
-    //     data = abc;
-    //     console.log('Intermediate data 222');
-    //     console.log(abc);
-        
-    //     let test = cache.writeQuery({ query: TodosQuery }, data);
-    //     console.log('After updating data');
-    //     console.log(test);
-        
-    //   }})//})
+  const createTodoFn = async text => {
+    await createTodo({
+      variables: {
+        text
+      },
+      update: (store, { data : { createTodo } }) => {
+        //Read date from cache
+        const data = store.readQuery({ query: TodosQuery });
+        //Adding to ToDo
+        data.todos.push(createTodo);
+        //Writing data back to cache
+        store.writeQuery({ query: TodosQuery , data});
+      }})
     .then(result => console.log(result));
+  }
+  const removeTodoFn = async todo => {
+    // await removeTodo({variables: {id: todo.id},
+
+    await removeTodo({
+      variables: {
+        id: todo.id,
+      },
+      update: store => {
+        //Read date from cache
+        const data = store.readQuery({ query: TodosQuery });
+        //Filtering out the deleted ToDo
+        data.todos.filter(x => x.id !== todo.id);
+        //Writing data back to cache
+        store.writeQuery({ query: TodosQuery , data});
+        
+      }})//})
+    .then(result => console.log(result));
+
   }
 
 
@@ -108,14 +116,17 @@ function App() {
 
   };
   const handleCreateTodo = (value)  => {
-    updateTodoFn(value)//.then(() => window.location.reload());
+    createTodoFn(value)//.then(() => window.location.reload());
 
   };
   const handleDelete = (value) => () => {
     removeTodoFn(value)//.then(() => window.location.reload());
 
   };
-  console.log(data)
+  // const handleCallback = (str) =>{
+  //   setTextStr(str);
+  // };
+  // console.log(data)
   return (
     <div style={{ display: "flex" }}>
       <div style={{ margin: "auto", width: 400 }}>
@@ -127,10 +138,6 @@ function App() {
           <Form submit = {handleCreateTodo}>
 
           </Form>
-          {/* {
-            data.todos.map(todo =>
-              <div key={`${todo.id}-todo-item`}>{todo.text}</div>)
-          } */}
           <List >
             {data.todos.map((value) => {
               const labelId = `checkbox-list-label-${value.id}`;
@@ -147,9 +154,9 @@ function App() {
                     />
                   </ListItemIcon>
                   <ListItemText id={labelId} primary={`${value.text}`} />
-                  <ListItemSecondaryAction>
+                  <ListItemSecondaryAction onClick = {handleDelete(value)}>
                     <IconButton edge="end" >
-                      <CloseIcon onClick = {handleDelete(value)}/>
+                      <CloseIcon />
                     </IconButton>
                   </ListItemSecondaryAction>
                 </ListItem>

@@ -7,10 +7,9 @@ function Form(props){
     const handleChange = (e) => {
         const newText = e.target.value;
         changeText(newText);
-        // console.log(text);
     }
     const handleKeyDown = (e) => {
-        if(e.key === 'enter'){
+        if(e.key === 'Enter'){
             props.submit(text);
             return e.target.value;
         }
@@ -22,6 +21,7 @@ function Form(props){
         <TextField id="standard-basic"
         onChange = {handleChange} 
         onKeyDown = {handleKeyDown}
+        value={text}
         label="New Task" fullWidth/>
     )
 }
